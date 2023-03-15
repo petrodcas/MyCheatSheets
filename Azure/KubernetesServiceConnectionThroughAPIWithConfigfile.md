@@ -2,7 +2,7 @@
 
 Steps to create a Kubernetes Service Connection in azure devops through commands.
 
-## Table of content
+## [Table of content][init]
 
 * **Creating Service Account in Kubernetes Cluster**
   * [Creating Service Account in Kubernetes Cluster](#creating-service-account-in-kubernetes-cluster)
@@ -15,7 +15,7 @@ Steps to create a Kubernetes Service Connection in azure devops through commands
   * [Creating the Service Connection's Configfile](#creating-the-service-connections-configfile)
   * [Creating the Service Connection through API request](#creating-the-service-connection-through-api-request)
 
-## Creating Service Account in Kubernetes Cluster
+## [Creating Service Account in Kubernetes Cluster][init]
 
 ```pwsh
     az account set -s {subscription Name or ID}
@@ -36,7 +36,7 @@ Steps to create a Kubernetes Service Connection in azure devops through commands
     kubectl config use-context $(aks_name)
 ```
 
-## Deploying ClusterRoleBinding
+## [Deploying ClusterRoleBinding][init]
 
 Create the file:
 
@@ -62,7 +62,7 @@ Then deploy it:
     kubectl apply -f {file name}
 ```
 
-## Deploying Secret
+## [Deploying Secret][init]
 
 Create file:
 
@@ -83,19 +83,19 @@ Then deploy it:
     kubectl apply -f {file name}
 ```
 
-## Getting Control Plane URL
+## [Getting Control Plane URL][init]
 
 ```pwsh
     kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
 ```
 
-## Getting Secret Token from Cluster
+## [Getting Secret Token from Cluster][init]
 
 ```pwsh
     kubectl get secret {service account name}-sa -n kube-system -o json
 ```
 
-## Creating the Service Connection's Configfile
+## [Creating the Service Connection's Configfile][init]
 
 Define the corresponding configfile in json format.
 
@@ -150,7 +150,7 @@ $headers = @{Authorization=("Basic {0}" -f $base64AuthInfo)}
 (Invoke-RestMethod -Uri "https://dev.azure.com/{Organization name}/_apis/serviceendpoint/types?api-version=7.0" -Headers $headers -Method Get).Value
 ```
 
-## Creating the Service Connection through API request
+## [Creating the Service Connection through API request][init]
 
 In case of necessity, here's the [Microsoft Documentation][APICreateEndpoint].
 
@@ -170,3 +170,4 @@ Invoke-RestMethod -Headers $headers -Method Post -Uri "https://dev.azure.com/{or
 [KubernetesEndpoint]: https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#kubernetes-service-connection
 [APICreateEndpoint]: https://learn.microsoft.com/en-us/rest/api/azure/devops/serviceendpoint/endpoints/create?view=azure-devops-rest-7.0&tabs=HTTP
 [APIGetEndpointTypes]: https://learn.microsoft.com/en-us/rest/api/azure/devops/serviceendpoint/types/list?view=azure-devops-rest-7.0&tabs=HTTP
+[init]: #creating-kubernetes-service-connection-through-configfile-and-api-request
