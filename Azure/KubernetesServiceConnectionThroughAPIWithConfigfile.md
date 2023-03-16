@@ -14,6 +14,7 @@ Steps to create a Kubernetes Service Connection in azure devops through commands
 * **Creating Service Connection through Devops API**
   * [Creating the Service Connection's Configfile](#creating-the-service-connections-configfile)
   * [Creating the Service Connection through API request](#creating-the-service-connection-through-api-request)
+  * [Setting "Grant access permission to all pipelines" option](#setting-grant-access-permission-to-all-pipelines-option)
 
 ## [Creating Service Account in Kubernetes Cluster][init]
 
