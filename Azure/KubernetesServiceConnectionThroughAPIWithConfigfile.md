@@ -23,14 +23,11 @@ Steps to create a Kubernetes Service Connection in azure devops through commands
     kubectl create serviceaccount {service account name} -n {namespace name}
 ```
 
-**Note:** These commands are required to log into the cluster through **PIPELINE**.
+**Note:** These commands are required to swap the cluster context through **PIPELINE**.
 
 ```pwsh
     # Convert kubeconfig to a valid format
     kubelogin convert-kubeconfig -l azurecli
-
-    # Set context in kubeconfig file
-    kubectl config set-context $(aks_name)
 
     # Swap context
     kubectl config use-context $(aks_name)
@@ -95,15 +92,29 @@ Then deploy it:
     kubectl get secret {service account name}-sa -n kube-system -o json
 ```
 
+**Note**: These commands can be used in order to pick the needed data from the previous request:
+
+```pwsh
+  # Get secret
+  $secret = (kubectl get secret $(service_account_name)-sa -n kube-system -o json) | ConvertFrom-Json
+  # Get apitoken
+  $apiToken = $secret.data.token
+  # Get serviceAccountCertificate
+  $serviceAccountCertificate = $secret.data."ca.crt"
+```
+
 ## [Creating the Service Connection's Configfile][init]
 
 Define the corresponding configfile in json format.
+
+**Sample configfile for a ServiceAccount authorization type:**
 
 ```json
 {
   "authorization": {
     "parameters": {
-      "serviceAccountCertificate": {Secret Token gotten from the cluster in previous step 'Getting Secret Token from Cluster'}
+      "serviceAccountCertificate": {ca.crt gotten from the cluster's secret in previous step 'Getting Secret Token from Cluster'},
+      "apiToken": {token gotten from the cluster's secret in previous step 'Getting Secret Token from Cluster'}
     },
     "scheme": "Token"
   },
@@ -138,12 +149,13 @@ These are some useful links when defining a custom configfile:
 * [Kubernetes Endpoint][KubernetesEndpoint]
 * [Listing Types of Endpoints][APIGetEndpointTypes]
 
-An example request through pipeline to [Azure Devops API][APIGetEndpointTypes] in order to list Endpoint Types:
+An example request to [Azure Devops API][APIGetEndpointTypes] in order to list Endpoint Types:
 
 ```pwsh
-# REMEMBER TO SET 'Allow scripts to access the OAuth token' IN THE AGENT
-# Define token user:token as base64 
-$base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes(("{0}:{1}" -f "user","$(System.AccessToken)")))
+# REMEMBER TO CREATE A PERSONAL ACCESS TOKEN IN AZURE DEVOPS
+
+# Define token user:token as base64 using PAT
+$base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes(("{0}:{1}" -f "$(Personal_Access_Token)","")))
 # Set authorization header
 $headers = @{Authorization=("Basic {0}" -f $base64AuthInfo)}
     
@@ -154,20 +166,59 @@ $headers = @{Authorization=("Basic {0}" -f $base64AuthInfo)}
 
 In case of necessity, here's the [Microsoft Documentation][APICreateEndpoint].
 
-Request through Azure Devops Pipeline:
-
 ```pwsh
-# REMEMBER TO SET 'Allow scripts to access the OAuth token' IN THE AGENT
-# Define token user:token as base64 
-$base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes(("{0}:{1}" -f "user","$(System.AccessToken)")))
+# REMEMBER TO CREATE A PERSONAL ACCESS TOKEN IN AZURE DEVOPS
+
+# Define token user:token as base64 using PAT
+$base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes(("{0}:{1}" -f "$(Personal_Access_Token)","")))
 # Set authorization header
 $headers = @{Authorization=("Basic {0}" -f $base64AuthInfo)}
 
-Invoke-RestMethod -Headers $headers -Method Post -Uri "https://dev.azure.com/{organization name}/_apis/serviceendpoint/endpoints?api-version=$(devops_api_version)" -ContentType "application/json" -Body $(Get-Content -Raw -Encoding utf8 {config file})
+Invoke-RestMethod -Headers $headers -Method Post `
+  -Uri "https://dev.azure.com/{organization name}/_apis/serviceendpoint/endpoints?api-version=7.0" `
+  -ContentType "application/json" -Body $(Get-Content -Raw -Encoding utf8 {config file})
+```
+
+## [Setting "Grant access permission to all pipelines" option][init]
+
+In case of necessity, here's the [Microsoft Documentation][APIGrantPipelinePermissions].
+
+Define the next json to be used by the request:
+
+```json
+  {
+    "allPipelines": {
+        "authorized": true,
+        "authorizedBy": null,
+        "authorizedOn": null
+    },
+    "pipelines": null
+}
+```
+
+Then execute the next lines:
+
+```pwsh
+  # REMEMBER TO CREATE A PERSONAL ACCESS TOKEN IN AZURE DEVOPS
+
+  # Define token user:token as base64 using PAT
+  $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes(("{0}:{1}" -f "$(Personal_Access_Token)","")))
+  # Set authorization header
+  $headers = @{Authorization=("Basic {0}" -f $base64AuthInfo)}
+
+  # Gets the endpoint ID through API
+  $id_endpoint = (Invoke-RestMethod -Headers $headers -Method Get `
+    -Uri "https://dev.azure.com/$(organization_name)/$(project_name)/_apis/serviceendpoint/endpoints?endpointNames=$(service_connection_name)&api-version=7.0").value.id
+
+  # Grants access permission using the previously defined json
+  Invoke-RestMethod -Headers $headers -Method Patch `
+    -Uri "https://dev.azure.com/$(organization_name)/$(project_name)/_apis/pipelines/pipelinePermissions/endpoint/$id_endpoint`?api-version=7.0-preview.1" `
+    -ContentType "application/json" -Body $(Get-Content -Raw -Encoding utf8 "$(json_file)")
 ```
 
 [CreateDevopsEndpoint]: https://learn.microsoft.com/en-us/azure/devops/cli/service-endpoint?view=azure-devops
 [KubernetesEndpoint]: https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#kubernetes-service-connection
 [APICreateEndpoint]: https://learn.microsoft.com/en-us/rest/api/azure/devops/serviceendpoint/endpoints/create?view=azure-devops-rest-7.0&tabs=HTTP
 [APIGetEndpointTypes]: https://learn.microsoft.com/en-us/rest/api/azure/devops/serviceendpoint/types/list?view=azure-devops-rest-7.0&tabs=HTTP
+[APIGrantPipelinePermissions]: https://learn.microsoft.com/en-us/rest/api/azure/devops/approvalsandchecks/pipeline-permissions/update-pipeline-permisions-for-resource?view=azure-devops-rest-7.0&tabs=HTTP
 [init]: #creating-kubernetes-service-connection-through-configfile-and-api-request
