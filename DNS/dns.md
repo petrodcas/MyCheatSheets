@@ -1,4 +1,4 @@
-# DNS [$^{1}$][cloudflare_doc]$^{,}$[$^{2}$][fp_doc]
+# DNS [<sup>**1**</sup>][cloudflare_doc]$^{,}$[<sup>**2**</sup>][fp_doc]
 
 ## Table of content
 
