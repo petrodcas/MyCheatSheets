@@ -1,16 +1,26 @@
-# DNS[$^{+}$][cloudflare_doc]
+# DNS[$^{1}$][cloudflare_doc]$^{,}$[$^{2}$][fp_doc]
 
 ## Table of content
 
-* Definition
-* Authoritatives and Resolvers
-* Forwarded Zones
-* DNS Zone
-* DNS Records
-* Inverse Resolution
-* Troubleshooting tools
-* Used port
-* Protocol
+* [Definition](#definition)
+* [Types of DNS servers](#types-of-dns-servers)
+* [DNS Functioning](#dns-functioning)
+* [Types of DNS queries](#types-of-dns-queries)
+* [DNS Caching](#dns-caching)
+  * [Browser DNS Caching](#browser-dns-caching)
+  * [Operating system (OS) level DNS Caching](#operating-system-os-level-dns-caching)
+* [DNS Records](#dns-records)
+  * [Most common types of DNS record](#most-common-types-of-dns-record)
+  * [Least common types of DNS record](#least-common-types-of-dns-record)
+* [Reverse DNS](#reverse-dns)
+  * [Reverse DNS Functioning](#reverse-dns-functioning)
+* [DNS zone](#dns-zone)
+  * [DNS zone file](#dns-zone-file)
+  * [Reverse Lookup Zone](#reverse-lookup-zone)
+* [DNS Forwarding Zone](#dns-forwarding-zone)
+* [DNS Troubleshooting Tools](#dns-troubleshooting-tools)
+  * [Command tools](#command-tools)
+  * [Website tools](#website-tools)
 
 ## Definition
 
@@ -30,7 +40,7 @@ There are 4 types of server involved in the IP address resolution:
 
 * **Authoritative Nameserver** - It hosts the IP address for the requested hostname. It's the final step in the nmeserver query.
 
-## Functioning
+## DNS Functioning
 
 1. User searches for `example.com`. This query travels through Internet up to a **DNS recursive resolver**.
 
@@ -131,10 +141,85 @@ All domains are required to have at least a few essential DNS records for a user
 
 * **SSHFP record** - This record stores the ‘SSH public key fingerprints’; SSH stands for Secure Shell and it’s a cryptographic networking protocol for secure communication over an unsecure network.
 
+## Reverse DNS
+
+A reverse DNS lookup is a DNS query for the domain name associated with a given IP address. This accomplishes the opposite of the more commonly used forward DNS lookup, in which the DNS system is queried to return an IP address.
+
+Standards from the Internet Engineering Task Force (IETF) suggest that every domain should be capable of reverse DNS lookup, but as reverse lookups are not critical to the normal function of the Internet, they are not a hard requirement. As such, reverse DNS lookups are not universally adopted.
+
+Reverse lookups are commonly used by email servers. Email servers check and see if an email message came from a valid server before bringing it onto their network. Many email servers will reject messages from any server that does not support reverse lookups or from a server that is highly unlikely to be legitimate. Spammers often use IP addresses from hijacked machines, which means there will be no PTR record. Or, they may use dynamically assigned IP addresses that lead to server domains with highly generic names.
+
+Logging software also employs reverse lookups in order to provide users with human-readable domains in their log data, as opposed to a bunch of numeric IP addresses.
+
+### Reverse DNS Functioning
+
+Reverse DNS lookups query DNS servers for a PTR (pointer) record; if the server does not have a PTR record, it cannot resolve a reverse lookup. PTR records store IP addresses with their segments reversed, and they append ".in-addr.arpa" to that. For example if a domain has an IP address of 192.0.2.1, the PTR record will store the domain's information under 1.2.0.192.in-addr.arpa.
+
+In IPv6, the latest version of the Internet Protocol, PTR records are stored within the ".ip6.arpa" domain instead of ".in-addr.arpa."
+
+## DNS zone [$^{+}$][dns_zone_doc]
+
+The DNS is broken up into many different zones. These zones differentiate between distinctly managed areas in the DNS namespace. A DNS zone is a portion of the DNS namespace that is managed by a specific organization or administrator. A DNS zone is an administrative space which allows for more granular control of DNS components, such as authoritative nameservers. The domain name space is a hierarchical tree, with the DNS root domain at the top. A DNS zone starts at a domain within the tree and can also extend down into subdomains so that multiple subdomains can be managed by one entity.
+
+A common mistake is to associate a DNS zone with a domain name or a single DNS server. In fact, a DNS zone can contain multiple subdomains and multiple zones can exist on the same server. DNS zones are not necessarily physically separated from one another, zones are strictly used for delegating control.
+
+### DNS zone file
+
+A zone file is a plain text file stored in a DNS server that contains an actual representation of the zone and contains all the records for every domain within the zone. Zone files must always start with a [Start of Authority (SOA) record][soa_record_doc], which contains important information including contact information for the zone administrator.
+
+### Reverse Lookup Zone
+
+A [reverse lookup][reverse_dns] zone contains mapping from an IP address to the host (the opposite function of most DNS zones). These zones are used for troubleshooting, spam filtering, and bot detection.
+
+## DNS Forwarding Zone
+
+A forwarding DNS server has a cache to store previous responses and so improve future duplicated queries.
+
+If the requested query can not be resolved with the data in this cache, then the DNS Forwarding server redirects the query to an external DNS server which is in fact responsible to resolve the query.
+
+Note that the Forwarding Server **DOES NOT** do recursive queries, it just delegates this to another DNS zone.
+
+This type of DNS server is quite useful when access to an external network is slow, expensive or saturated.
+
+## DNS Troubleshooting Tools
+
+### Command tools
+
+* **nslookup**[$^{+}$][nslookup_doc] - Windows and Linux utily. **(RECOMMENDED)**
+
+* **dig**[$^{+}$][dig_doc] - Linux utility.
+
+* **host**[$^{+}$][host_doc] - Linux utility.
+
+* **whois**[$^{+}$][whois_doc] - Linux utility.
+
+### Website tools
+
+* [**intoDNS**][intodns_site] **(RECOMMENDED)**
+
+* [**DNS Spy**][dnsspy_site]
+
+* [**MX Toolbox**][mxtoolbox_site] - Quite useful to check mail services' health and configuration problems.
+
+* [**DNSquery**][dnsquery_site] - Bunch of tools in the same webpage.
+
 [//]: # (LINK LABELS)
 
 [//]: # (GENERAL DOC LINK)
 [cloudflare_doc]: https://www.cloudflare.com/en-gb/learning/dns/what-is-dns/
+[fp_doc]: https://www.fpgenred.es/DNS/_cmo_funciona_.html
+[dns_zone_doc]: https://www.cloudflare.com/en-gb/learning/dns/glossary/dns-zone/
+
+[//]: # (TROUBLESHOOTING LINKS)
+[nslookup_doc]: https://linux.die.net/man/1/nslookup
+[dig_doc]: https://linux.die.net/man/1/dig
+[host_doc]: https://linux.die.net/man/1/host
+[whois_doc]: https://linux.die.net/man/1/whois
+[dnsspy_site]: https://dnsspy.io/
+[intodns_site]: https://intodns.com/
+[mxtoolbox_site]: https://mxtoolbox.com/
+[dnsquery_site]: https://dnsquery.org/
+
 [//]: # (DNS RECORDS LINKS)
 [a_record_doc]: https://www.cloudflare.com/learning/dns/dns-records/dns-a-record/
 [aaaa_record_doc]: https://www.cloudflare.com/learning/dns/dns-records/dns-aaaa-record/
@@ -146,3 +231,5 @@ All domains are required to have at least a few essential DNS records for a user
 [srv_record_doc]: https://www.cloudflare.com/learning/dns/dns-records/dns-soa-record/
 [ptr_record_doc]: https://www.cloudflare.com/learning/dns/dns-records/dns-ptr-record/
 
+[//]: # (IN-DOCUMENT LINKS)
+[reverse_dns]: #reverse-dns
