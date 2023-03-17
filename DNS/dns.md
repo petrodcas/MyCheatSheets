@@ -97,15 +97,15 @@ All domains are required to have at least a few essential DNS records for a user
 
 ### Most common types of DNS record
 
-* **A record**[$^{+}$][a_record_doc] - The record that holds the IPv4 address of a domain.
-* **AAAA record**[$^{+}$][aaaa_record_doc] - The record that contains the IPv6 for a domain.
-* **CNAME record**[$^{+}$][cname_record_doc] - Forwards one domain or subdomain to another domain, but does **NOT** provide an IP address.
-* **MX record**[$^{+}$][mx_record_doc] - Directs mail to an email server.
-* **TXT record**[$^{+}$][txt_record_doc] - Lets an admin store text notes in the record. These records are often used for email security.
-* **NS record**[$^{+}$][ns_record_doc] - Stores admin information about a domain.
-* **SOA record**[$^{+}$][soa_record_doc] - Stores admin information about a domain.
-* **SRV record**[$^{+}$][srv_record_doc] - Specifies a port for specific services.
-* **PTR record**[$^{+}$][ptr_record_doc] - Provides a domain name in reverse-lookups.
+* **A record**[<sup>**+**</sup>][a_record_doc] - The record that holds the IPv4 address of a domain.
+* **AAAA record**[<sup>**+**</sup>][aaaa_record_doc] - The record that contains the IPv6 for a domain.
+* **CNAME record**[<sup>**+**</sup>][cname_record_doc] - Forwards one domain or subdomain to another domain, but does **NOT** provide an IP address.
+* **MX record**[<sup>**+**</sup>][mx_record_doc] - Directs mail to an email server.
+* **TXT record**[<sup>**+**</sup>][txt_record_doc] - Lets an admin store text notes in the record. These records are often used for email security.
+* **NS record**[<sup>**+**</sup>][ns_record_doc] - Stores admin information about a domain.
+* **SOA record**[<sup>**+**</sup>][soa_record_doc] - Stores admin information about a domain.
+* **SRV record**[<sup>**+**</sup>][srv_record_doc] - Specifies a port for specific services.
+* **PTR record**[<sup>**+**</sup>][ptr_record_doc] - Provides a domain name in reverse-lookups.
 
 ### Least common types of DNS record
 
@@ -157,7 +157,7 @@ Reverse DNS lookups query DNS servers for a PTR (pointer) record; if the server 
 
 In IPv6, the latest version of the Internet Protocol, PTR records are stored within the ".ip6.arpa" domain instead of ".in-addr.arpa."
 
-## DNS zone [$^{+}$][dns_zone_doc]
+## DNS zone [<sup>**+**</sup>][dns_zone_doc]
 
 The DNS is broken up into many different zones. These zones differentiate between distinctly managed areas in the DNS namespace. A DNS zone is a portion of the DNS namespace that is managed by a specific organization or administrator. A DNS zone is an administrative space which allows for more granular control of DNS components, such as authoritative nameservers. The domain name space is a hierarchical tree, with the DNS root domain at the top. A DNS zone starts at a domain within the tree and can also extend down into subdomains so that multiple subdomains can be managed by one entity.
 
@@ -185,13 +185,13 @@ This type of DNS server is quite useful when access to an external network is sl
 
 ### Command tools
 
-* **nslookup**[$^{+}$][nslookup_doc] - Windows and Linux utily. **(RECOMMENDED)**
+* **nslookup**[<sup>**+**</sup>][nslookup_doc] - Windows and Linux utily. **(RECOMMENDED)**
 
-* **dig**[$^{+}$][dig_doc] - Linux utility.
+* **dig**[<sup>**+**</sup>][dig_doc] - Linux utility.
 
-* **host**[$^{+}$][host_doc] - Linux utility.
+* **host**[<sup>**+**</sup>][host_doc] - Linux utility.
 
-* **whois**[$^{+}$][whois_doc] - Linux utility.
+* **whois**[<sup>**+**</sup>][whois_doc] - Linux utility.
 
 ### Website tools
 
