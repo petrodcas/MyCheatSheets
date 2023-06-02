@@ -12,7 +12,7 @@ Every cluster node consumes an IP from each subnet (that is, a cluster node has 
 
 One of these subnets is "*public*" - a.k.a. "*host subnet*" - and the other is "*privated*" - a.k.a. "*container subnet*" - (meaning there are no public IP assigned to the nodes nor opened ports). If the workspace uses the option [secure cluster connectivity](https://learn.microsoft.com/en-us/azure/databricks/security/network/secure-cluster-connectivity), then both of the subnets become *privated*.
 
-When defining CIDR for the subnets, remember that Azure reserves 5 host IPs on each subnet, since it limitates the number of cluster nodes than could be deployed.
+When defining CIDR for the subnets, remember that Azure reserves 5 host IPs on each subnet, since it limitates the number of cluster nodes that could be deployed.
 
 ## Requirements of the VNET
 
